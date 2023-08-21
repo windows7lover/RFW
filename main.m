@@ -38,17 +38,12 @@ for i=1:nIter
     
     v = linear_max_oracle_v2(-gradx, x, radius_max, x_center, manifold);
     
-    manifold.dist(x_center,v)-radius_max
-    
 %     v = linear_max_oracle(-gradx, x, radius_max, x_center, manifold);
     accuracy(i) = -manifold.inner(x, gradx, manifold.log(x, v));
     
     step_size = -manifold.inner(x, gradx, manifold.log(x, v)) / (L*manifold.dist(x, v)^2);
     step_size = min(step_size, 1);
     x = manifold.exp(x, manifold.log(x, v), step_size);
-    
-    
-    [manifold.dist(x,x_center),radius_max]
     
 %     x = line_search(x, v, f, i, manifold);
 end
