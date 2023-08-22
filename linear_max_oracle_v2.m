@@ -11,149 +11,43 @@ u1 = manifold.log(x, x0);
 u1 = u1/norm(u1);
 u2 = w-u1*(u1'*w);
 u2 = u2/norm(u2);
-
-p_plus = @(gamma) gamma*u1 + (1-gamma^2)*u2;
-p_minus = @(gamma) gamma*u1 - (1-gamma^2)*u2;
+p = @(phi) cos(phi)*u1 + sin(phi)*u2;
 
 max_val = -inf;
 
-% gamma = 1;
-% plot_alpha_sphere(p_plus(gamma))
-% figure
-% plot_alpha(p_plus(gamma))
-% alpha(p_plus(gamma))
+delta_phi = 0.001;
 
-best_gamma = [];
-% Initial trial for gamma
-delta_gamma = 0.001;
-for gamma = -1:delta_gamma:1
-    v_plusplus = alpha_plus(p_plus(gamma))*p_plus(gamma);
-    v_minusplus = alpha_minus(p_plus(gamma))*p_plus(gamma);
+
+for phi = -pi:delta_phi:pi
+    v_plus = alpha_plus(p(phi))*p(phi);
+    v_minus = alpha_minus(p(phi))*p(phi);
     
-    v_plusminus = alpha_plus(p_minus(gamma))*p_minus(gamma);
-    v_minusminus = alpha_minus(p_minus(gamma))*p_minus(gamma);
-    
-    if (w'*v_plusplus > max_val) && (~any(isnan(v_plusplus)))
-        max_val = w'*v_plusplus;
-        best_gamma = gamma;
+    if (w'*v_plus > max_val) && (~any(isnan(v_plus)))
+        max_val = w'*v_plus;
+        best_phi = phi;
         best_alpha = @(p) alpha_plus(p);
-        best_p = p_plus;
-%         best_v = v_plusplus;
     end
-    
-    
-    if (w'*v_minusplus > max_val) && ~any(isnan(v_minusplus))
-        max_val = w'*v_minusplus;
-        best_gamma = gamma;
+    if (w'*v_minus > max_val) && (~any(isnan(v_minus)))
+        max_val = w'*v_minus;
+        best_phi = phi;
         best_alpha = @(p) alpha_minus(p);
-        best_p = p_plus;
-%         best_v = v_minusplus;
-    end
-    
-    if (w'*v_plusminus > max_val) && ~any(isnan(v_plusminus))
-        max_val = w'*v_plusminus;
-        best_gamma = gamma;
-        best_alpha = @(p) alpha_plus(p);
-        best_p = p_minus;
-%         best_v = v_plusminus;
-    end
-    
-    if (w'*v_minusminus > max_val) && ~any(isnan(v_minusminus))
-        max_val = w'*v_minusminus;
-        best_gamma = gamma;
-        best_alpha = @(p) alpha_minus(p);
-        best_p = p_minus;
-%         best_v = v_minusminus;
     end
     
 end
 
-fhandle = @(gamma) w'*(best_alpha(best_p(gamma))*best_p(gamma));
+
+fhandle = @(phi) w'*(best_alpha(p(phi))*p(phi));
 options = optimset('TolX',1e-8);
-best_gamma = fminbnd(fhandle, best_gamma-delta_gamma, best_gamma+delta_gamma,options);
-
-v = manifold.exp(x, best_p(best_gamma), best_alpha(best_p(best_gamma)));
-
-% if(manifold.dist(v,x0) > R)
-%     display('wtf')
-% end
+best_phi = fminbnd(fhandle, best_phi-delta_phi, best_phi+delta_phi,options);
+v = manifold.exp(x, p(best_phi), best_alpha(p(best_phi)));
 
     function best_alpha = alpha_plus(p)
-        
         best_alpha = max(solve_sincoseq(x0'*x,x0'*p,(1-2*sin(R/2)^2)));
-%         fun_alpha = @(alpha) manifold.dist( manifold.exp(x,p,alpha), x0)-R;
-% %         fun_alpha = @(alpha) norm(x*cos(alpha)+p*sin(alpha)-x0)-2*sin(R/2);
-%         fun_alpha2 = @(alpha) x0'*(x*cos(alpha) + p*sin(alpha))-(3/2-sin(R/2));
-%         
-%         try
-%             best_alpha=fzero(fun_alpha, [0,pi]);
-%             best_alpha2=fzero(fun_alpha2, [0,pi]);
-%             [best_alpha, best_alpha2]
-% 
-% %             best_alpha=fzero(fun_alpha, [0,pi]);
-%             while(fun_alpha(best_alpha)>0)
-%                 best_alpha = best_alpha-1e-8;
-%             end
-%         catch
-%             best_alpha = NaN;
-%         end
-        
     end
 
 
     function best_alpha = alpha_minus(p)
         best_alpha = min(solve_sincoseq(x0'*x,x0'*p,(1-2*sin(R/2)^2)));
-% %         fun_alpha = @(alpha) manifold.dist( manifold.exp(x,p,alpha), x0)-R;
-% %         fun_alpha = @(alpha) norm(x*cos(alpha)+p*sin(alpha)-x0)-2*sin(R/2);
-%         fun_alpha = @(alpha) x0'*(x*cos(alpha) + p*sin(alpha))-(1-2*sin(R/2)^2);
-% %         best_alpha=fzero(fun_alpha, [-pi,0]);
-%         try
-%             best_alpha=fzero(fun_alpha, [0,pi]);
-% %             best_alpha2=fzero(fun_alpha2, [0,pi]);
-%         catch
-%             best_alpha = NaN;
-% %             best_alpha2 = NaN;
-%         end
-% %         [best_alpha, best_alpha2]
-%         [best_alpha, ]
-%         1
-    end
-
-    function plot_alpha3(p)
-        
-        alpha_vec = -pi:0.1:pi;
-        fun_alpha = @(alpha) manifold.dist( manifold.exp(x,p,alpha), x0)-R;
-        
-        for i=1:length(alpha_vec)
-            alpha_try = alpha_vec(i);
-            funval(i) = fun_alpha(alpha_try);
-        end
-        plot(alpha_vec, funval)
-    end
-
-    function plot_alpha(p)
-        
-        alpha_vec = -pi:0.1:pi;
-        fun_alpha = @(alpha) norm(x*cos(alpha)+p*sin(alpha)-x0)-2*sin(R/2);
-        
-        for i=1:length(alpha_vec)
-            alpha_try = alpha_vec(i);
-            funval(i) = fun_alpha(alpha_try);
-        end
-        plot(alpha_vec, funval)
-    end
-
-
-    function plot_alpha2(p)
-        
-        alpha_vec = -pi:0.1:pi;
-        fun_alpha = @(alpha) (x0'*(x*cos(alpha) + p*sin(alpha))-(1-2*sin(R/2)^2));
-        
-        for i=1:length(alpha_vec)
-            alpha_try = alpha_vec(i);
-            funval(i) = fun_alpha(alpha_try);
-        end
-        plot(alpha_vec, funval)
     end
 
     
