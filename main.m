@@ -11,7 +11,7 @@ A = A/norm(A);
 accuracy = zeros(1, nIter+1);
  
 % Create the problem structure.
-manifold = spherefactory(n);
+manifold = spherefactory(d);
  
 % Define the problem cost function and its derivatives.
 xstar = ones(d, 1);
