@@ -54,7 +54,7 @@ accuracy(end) = -manifold.inner(x, gradx, manifold.log(x, v));
 % semilogy(accuracy(1:1e3)-min(accuracy))
 close all
 
-fig = figure;
+fig = figure('Renderer', 'painters', 'Position', [10 10 700 500]);
 facealpha = 0.5;
 fs = 16;
 fs2 = 12;
@@ -89,9 +89,8 @@ han.Title.Visible='off';
 han.XLabel.Visible='on';
 han.YLabel.Visible='on';
 ylabel(han,'RFW Duality Gap', 'interpreter', 'latex');
-xlabel(han,'\#Gradient Oracle Calls', 'interpreter', 'latex');
-
 set(gca, 'fontsize', fs)
+xlabel(han,'\#Gradient Oracle Calls', 'interpreter', 'latex');
 
 %     % plot the manifold
 %     [X,Y,Z] = sphere(100);
