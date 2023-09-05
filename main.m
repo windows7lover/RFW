@@ -12,7 +12,7 @@ accuracy = zeros(1, nIter+1);
 dualgap =  zeros(1, nIter+1);
  
 % Create the problem structure.
-manifold = spherefactory(n);
+manifold = spherefactory(d);
  
 
 x_center = abs(rand(d,1));
@@ -65,7 +65,7 @@ semilogy(real(accuracy))
 hold on
 semilogy(real(dualgap))
 
-fig = figure;
+fig = figure('Renderer', 'painters', 'Position', [10 10 700 500]);
 facealpha = 0.5;
 fs = 16;
 fs2 = 12;
@@ -100,9 +100,8 @@ han.Title.Visible='off';
 han.XLabel.Visible='on';
 han.YLabel.Visible='on';
 ylabel(han,'RFW Duality Gap', 'interpreter', 'latex');
-xlabel(han,'\#Gradient Oracle Calls', 'interpreter', 'latex');
-
 set(gca, 'fontsize', fs)
+xlabel(han,'\#Gradient Oracle Calls', 'interpreter', 'latex');
 
 %     % plot the manifold
 %     [X,Y,Z] = sphere(100);
