@@ -9,19 +9,23 @@ A = randn(n,d);
 A = A'*A;
 A = A/norm(A);
 accuracy = zeros(1, nIter+1);
+dualgap =  zeros(1, nIter+1);
  
 % Create the problem structure.
 manifold = spherefactory(n);
  
+
+x_center = abs(rand(d,1));
+x_center = x_center/norm(x_center);
+
 % Define the problem cost function and its derivatives.
 xstar = ones(d, 1);
+% xstar = -x_center;
 xstar = xstar / norm(xstar);
 f = @(x) 0.5*(x-xstar)'*A*(x-xstar);
 egrad = @(x) A*(x-xstar);
 mgrad = @(x) manifold.egrad2rgrad(x, egrad(x));
 
-x_center = abs(rand(d,1));
-x_center = x_center/norm(x_center);
 
 radius_max = manifold.dist(x_center,xstar)*radius_ratio;
 setFunction = @(x) manifold.dist(x_center, x)<=radius_max;
@@ -40,10 +44,12 @@ for i=1:nIter
     
 %     v = linear_max_oracle(-gradx, x, radius_max, x_center, manifold);
     accuracy(i) = -manifold.inner(x, gradx, manifold.log(x, v));
+    dualgap(i) = f(x);
     
     step_size = -manifold.inner(x, gradx, manifold.log(x, v)) / (L*manifold.dist(x, v)^2);
     step_size = min(step_size, 1);
     x = manifold.exp(x, manifold.log(x, v), step_size);
+    
     
 %     x = line_search(x, v, f, i, manifold);
 end
@@ -52,7 +58,12 @@ accuracy(end) = -manifold.inner(x, gradx, manifold.log(x, v));
 
 %% 
 % semilogy(accuracy(1:1e3)-min(accuracy))
-close all
+% close all
+
+figure
+semilogy(real(accuracy))
+hold on
+semilogy(real(dualgap))
 
 fig = figure;
 facealpha = 0.5;

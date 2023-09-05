@@ -1,7 +1,0 @@
-function out = solve_sincoseq(a,b,c)
-% solve a*sin(x)+b*cos(x)=c
-
-middle = (b-sqrt(a^2+b^2-c^2))/(a+c);
-while
-
-out = 2*atan(middle);
