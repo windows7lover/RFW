@@ -40,7 +40,7 @@ for i=1:nIter
     f(x)
     gradx = mgrad(x);
     
-    v = linear_max_oracle_v2(-gradx, x, radius_max, x_center, manifold);
+    v = linear_max_oracle(-gradx, x, radius_max, x_center, manifold);
     
 %     v = linear_max_oracle(-gradx, x, radius_max, x_center, manifold);
     accuracy(i) = -manifold.inner(x, gradx, manifold.log(x, v));
@@ -53,7 +53,7 @@ for i=1:nIter
     
 %     x = line_search(x, v, f, i, manifold);
 end
-v = linear_max_oracle_v2(-gradx, x, radius_max, x_center, manifold);
+v = linear_max_oracle(-gradx, x, radius_max, x_center, manifold);
 accuracy(end) = -manifold.inner(x, gradx, manifold.log(x, v));
 
 %% 
@@ -102,37 +102,5 @@ han.YLabel.Visible='on';
 ylabel(han,'RFW Duality Gap', 'interpreter', 'latex');
 set(gca, 'fontsize', fs)
 xlabel(han,'\#Gradient Oracle Calls', 'interpreter', 'latex');
-
-%     % plot the manifold
-%     [X,Y,Z] = sphere(100);
-%     surf(X,Y,Z)
-%     hold on
-%     r = 1;
-%     list_point = [];
-%     for theta = 0:0.01:2*pi
-%         theta
-%         for phi = 0:0.01:pi
-%             point = [sin(theta)*cos(phi), sin(theta)*sin(phi), cos(theta)];
-%             
-%             if(dist(point, x_center) < radius_max)
-%                 list_point = [list_point ; r*point];
-%             end
-%                 
-%         end
-%     end
-%     plot3(list_point(:,1),list_point(:,2),list_point(:,3),'.r');
-%     plot3(x_center(1),x_center(2),x_center(3),'.g','markersize',15)
-%     hold on
-%     % Plot grad direction and x0
-%     vecGrad = [];
-%     vecx0 = [];
-%     for rho = -3:0.01:3
-%         vec1 = x+rho*gradx/norm(gradx);
-%         vecGrad = [vecGrad;vec1'];
-%         vec2 = x + rho*(manifold.log(x,x_center))/norm(manifold.log(x,x_center));
-%         vecx0 = [vecx0; vec2'];
-%     end
-%     plot3(vecGrad(:,1),vecGrad(:,2),vecGrad(:,3),'.')
-%     plot3(vecx0(:,1),vecx0(:,2),vecx0(:,3),'.')
     
     
